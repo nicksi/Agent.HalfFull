@@ -53,7 +53,12 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\awake72.tinyfnt" />
+    <None Include="Resources\awake72o.tinyfnt" />
+    <None Include="Resources\DayPosterBlack48.tinyfnt" />
     <None Include="Resources\NinaB.tinyfnt" />
     <None Include="Resources\small.tinyfnt" />
+    <None Include="Resources\ubuntu12.tinyfnt" />
+    <None Include="Resources\ubuntu12c.tinyfnt" />
   </ItemGroup>
 </Project>
