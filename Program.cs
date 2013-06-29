@@ -4,6 +4,7 @@ using Microsoft.SPOT.Hardware;
 using Microsoft.SPOT.Presentation;
 using Microsoft.SPOT.Presentation.Media;
 using System.Threading;
+using Agent.Contrib.Hardware;
 
 namespace Agent.HalfFull
 {
@@ -12,7 +13,11 @@ namespace Agent.HalfFull
         static Bitmap _display;
         static Timer _updateClockTimer;
 
-        const bool FORMAT_24 = true;
+        private static bool FORMAT_24 = true;
+        static DateTime currentTime = DateTime.Now;
+
+        public event ButtonHelper.ButtonPress OnButtonPress;
+        private static ButtonHelper buttonHelper;
 
         public static void Main()
         {
@@ -26,8 +31,12 @@ namespace Agent.HalfFull
             DateTime currentTime = DateTime.Now;
             // set up timer to refresh time every minute
             TimeSpan dueTime = new TimeSpan(0, 0, 0, 59 - currentTime.Second, 1000 - currentTime.Millisecond); // start timer at beginning of next minute
-            TimeSpan period = new TimeSpan(0, 0, 1, 0, 0); // update time every minute
+            //TimeSpan period = new TimeSpan(0, 0, 1, 0, 0); // update time every minute
+            TimeSpan period = new TimeSpan(0, 0, 0, 1, 0); // update time every minute
             _updateClockTimer = new Timer(UpdateTime, null, dueTime, period); // start our update timer
+
+            buttonHelper = ButtonHelper.Current;
+            buttonHelper.OnButtonPress += buttonHelper_OnButtonPress;
 
             // go to sleep; time updates will happen automatically every minute
             Thread.Sleep(Timeout.Infinite);
@@ -36,7 +45,8 @@ namespace Agent.HalfFull
         static void UpdateTime(object state)
         {
             // obtain the current time
-            DateTime currentTime = DateTime.Now;
+            //DateTime currentTime = DateTime.Now;
+            currentTime = currentTime.AddMinutes(1);
             // clear our display buffer
             _display.Clear();
 
@@ -61,21 +71,18 @@ namespace Agent.HalfFull
             const int TICK_STEP = 14;
             const int OFFSET = 8;
             const float REAL_HEIGHT = 84f;
-            //int empty_part = (int)(REAL_HEIGHT * ( 1 - currentTime.Minute/60f));
-            int empty_part = (int)(REAL_HEIGHT * (1 - 30 / 60f));
+            int empty_part = (int)(REAL_HEIGHT * ( 1 - currentTime.Minute/60f));
+            //int empty_part = (int)(REAL_HEIGHT * (1 - 30 / 60f));
 
-            string hours = (hrs + 12).ToString();
+            string hours = (hrs).ToString();
 
-            if ( hours.Length == 2)
-                _display.DrawText(hours,
-                    fontHour,
-                    Color.White,
-                    10, -22);
-            else
-                _display.DrawText(hours,
-                    fontHour,
-                    Color.White,
-                    45, -22);
+            _display.DrawTextInRect(hours, 10, -22, 90, 90, Bitmap.DT_AlignmentCenter | Bitmap.DT_IgnoreHeight, Color.White, fontHour);
+
+            if (!FORMAT_24)
+                if (currentTime.Hour < 12)
+                    _display.DrawText("AM", fontDate, Color.White, 3, 60);
+                else
+                    _display.DrawText("PM", fontDate, Color.White, 3, 60);
 
 
             // start at top inverse all pixels except last and first
@@ -127,6 +134,17 @@ namespace Agent.HalfFull
             // flush the display buffer to the display
             _display.Flush();
         }
+
+        private static void buttonHelper_OnButtonPress(Buttons button, InterruptPort port, ButtonDirection direction, DateTime time)
+        {
+            if (button == Buttons.MiddleRight && direction == ButtonDirection.Up)
+            {
+                FORMAT_24 = !FORMAT_24;
+                UpdateTime(null);
+            }
+
+        }
+
 
     }
 }
