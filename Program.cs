@@ -41,7 +41,7 @@ namespace Agent.HalfFull
             _display.Clear();
 
             Font fontDate = Resources.GetFont(Resources.FontResources.ubuntu12);
-            Font fontHour = Resources.GetFont(Resources.FontResources.awake72o);
+            Font fontHour = Resources.GetFont(Resources.FontResources.AmericanCaptain);
             Font fontTicks = Resources.GetFont(Resources.FontResources.ubuntu12c);
 
             // draw date 
@@ -56,54 +56,69 @@ namespace Agent.HalfFull
 
             //Draw  time
             int hrs = FORMAT_24?currentTime.Hour:currentTime.Hour%12;
-            int hrs_w, hrs_h;
-            fontHour.ComputeExtent(hrs.ToString("D2"), out hrs_w, out hrs_h);
 
             // compute share to fill
-            int empty_part = (int)(hrs_h - (float)hrs_h/60f * currentTime.Minute);
+            const int TICK_STEP = 14;
+            const int OFFSET = 8;
+            const float REAL_HEIGHT = 84f;
+            //int empty_part = (int)(REAL_HEIGHT * ( 1 - currentTime.Minute/60f));
+            int empty_part = (int)(REAL_HEIGHT * (1 - 30 / 60f));
 
-            _display.DrawText(hrs.ToString(),
-                fontHour,
-                Color.White,
-                10, 5);
+            string hours = (hrs + 12).ToString();
+
+            if ( hours.Length == 2)
+                _display.DrawText(hours,
+                    fontHour,
+                    Color.White,
+                    10, -22);
+            else
+                _display.DrawText(hours,
+                    fontHour,
+                    Color.White,
+                    45, -22);
+
 
             // start at top inverse all pixels except last and first
             bool OutIn = false;
+            bool FirstRow = true;
+            bool FoundFirstRow = false;
 
-            for (int y = 5; y < 5 + empty_part; ++y)
+            for (int y = OFFSET; y < OFFSET + empty_part; ++y)
             {
                 OutIn = false;
+                if (FoundFirstRow) FirstRow = false;
                 for (int x = 10; x < 100; ++x)
                 {
                     if (_display.GetPixel(x, y) == Color.White)
                     {
-                        if (!OutIn) // "in edge" - leave as is
+                        if (!OutIn ) // "in edge" - leave as is
                         {
                             OutIn = true;
+                            FoundFirstRow = true;
                         }
-                        else
+                        else if (_display.GetPixel(x, y + 2) == Color.White && _display.GetPixel(x - 1, y) == Color.White && _display.GetPixel(x + 2, y) == Color.White && !FirstRow)
                             _display.SetPixel(x, y, Color.Black);
                     }
                     else
                     {
-                        if (OutIn && _display.GetPixel(x, y+1) == Color.White) // out edge
-                        {
-                            _display.SetPixel(x - 1, y, Color.White);
                             OutIn = false;
-                        }
                     }
                 }
             }
 
-            _display.SetClippingRectangle(0, 0, 120, 128);
+            //_display.SetClippingRectangle(0, 0, 120, 128);
 
             // Draw minute rules
-            for ( int m = 0; m <= 6; ++m)
+            for ( int m = 0; m < 6; ++m)
             {
-                _display.DrawLine(Color.White, 1, 105, 5 + 14 * m, 115, 5 + 14 * m);
-                _display.DrawLine(Color.White, 1, 110, 5 + 14 * m + 7, 115, 5 + 14 * m + 7);
-                _display.DrawText((60 - m * 10).ToString(), fontTicks, Color.White, 118, 14 * m);
+                _display.DrawLine(Color.White, 1, 105, OFFSET + TICK_STEP * m, 115, OFFSET + TICK_STEP * m);
+                _display.DrawLine(Color.White, 1, 110, OFFSET + TICK_STEP * m + 6, 115, OFFSET + TICK_STEP * m + 6);
+                _display.DrawText((60 - m * 10).ToString(), fontTicks, Color.White, 118, TICK_STEP * m);
             }
+
+            // last tick
+            _display.DrawLine(Color.White, 1, 105, OFFSET + TICK_STEP * 6, 115, OFFSET + TICK_STEP * 6);
+            _display.DrawText((60 - 6 * 10).ToString(), fontTicks, Color.White, 118, TICK_STEP * 6);
 
 
             

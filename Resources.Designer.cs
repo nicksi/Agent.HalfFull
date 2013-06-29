@@ -33,10 +33,8 @@ namespace Agent.HalfFull
         internal enum FontResources : short
         {
             ubuntu12 = -15059,
-            awake72 = -12324,
             ubuntu12c = -287,
-            DayPosterBlack48 = 6868,
-            awake72o = 21915,
+            AmericanCaptain = 24363,
         }
     }
 }

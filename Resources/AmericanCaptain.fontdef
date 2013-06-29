@@ -1,0 +1,6 @@
+Verbosity 0
+AddFontToProcess "C:\\Users\\nsitnikov\\Dropbox\\tdw\\assets\\American Captain.ttf"
+SelectFont "FN:American Captain,WE:400,HE:-120,WI:0,ES:0,IT:0,UN:0,CS:0,OP:0,CP:0,QA:0,PF:0,Script:Western,Style:Regular"
+SetDefaultCharacter
+ImportRange 48 57
+Verbosity 1
