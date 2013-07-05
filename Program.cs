@@ -19,6 +19,12 @@ namespace Agent.HalfFull
         public event ButtonHelper.ButtonPress OnButtonPress;
         private static ButtonHelper buttonHelper;
 
+
+
+        static Font fontDate = Resources.GetFont(Resources.FontResources.ubuntu12);
+        static Font fontHour = Resources.GetFont(Resources.FontResources.AmericanCaptain);
+        static Font fontTicks = Resources.GetFont(Resources.FontResources.ubuntu12c);
+
         public static void Main()
         {
             // initialize our display buffer
@@ -50,9 +56,6 @@ namespace Agent.HalfFull
             // clear our display buffer
             _display.Clear();
 
-            Font fontDate = Resources.GetFont(Resources.FontResources.ubuntu12);
-            Font fontHour = Resources.GetFont(Resources.FontResources.AmericanCaptain);
-            Font fontTicks = Resources.GetFont(Resources.FontResources.ubuntu12c);
 
             // draw date 
             _display.DrawTextInRect(
